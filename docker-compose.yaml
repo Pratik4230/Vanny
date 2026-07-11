@@ -1,0 +1,35 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: vanni_postgres
+    restart: unless-stopped
+    environment: 
+      POSTGRES_USER: vanni
+      POSTGRES_PASSWORD: vanni
+      POSTGRES_DB: vanni
+    ports:
+      - "5432:5432"
+    volumes:
+      - vanni_postgres_data:/var/lib/postgresql/data
+    networks:
+      - vanni
+
+  redis:
+    image: redis:7-alpine
+    container_name: vanni_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - vanni_redis_data:/data
+    networks:
+      - vanni
+
+volumes:
+  vanni_postgres_data:
+    driver: local
+  vanni_redis_data:
+    driver: local
+networks:
+  vanni:
+    driver: bridge
