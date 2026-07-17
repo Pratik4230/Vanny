@@ -31,4 +31,16 @@ export class PrismaService implements OnModuleInit {
     await this.client.$queryRaw`SELECT 1`;
     return true;
   }
+
+  get interviewFormat() {
+    return this.client.interviewFormat;
+  }
+
+  get conversation() {
+    return this.client.conversation;
+  }
+
+  get message() {
+    return this.client.message;
+  }
 }

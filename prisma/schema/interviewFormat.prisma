@@ -1,0 +1,9 @@
+
+model InterviewFormat {
+    id String @id @default(cuid()) 
+    title String 
+    baseSystemPrompt String
+    isActive Boolean @default(true)
+    createdAt     DateTime       @default(now())
+    conversations Conversation[]
+}

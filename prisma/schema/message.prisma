@@ -1,0 +1,15 @@
+model Message {
+  id             String   @id @default(cuid())
+  conversationId String
+  turnIndex      Int
+  questionText   String?
+  transcriptText String?
+  aiResponseText String?
+  durationMs     Int?
+  createdAt      DateTime @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@unique([conversationId, turnIndex])
+  @@index([conversationId])
+}

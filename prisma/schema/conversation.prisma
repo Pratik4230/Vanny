@@ -1,0 +1,38 @@
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum ConversationStatus {
+  PENDING
+  ACTIVE
+  COMPLETED
+  ABANDONED
+  FAILED
+}
+
+model Conversation {
+  id              String             @id @default(cuid())
+  userId          String
+  formatId        String
+  status          ConversationStatus @default(PENDING)
+  track           String
+  focusAreas      String[]
+  difficulty      Difficulty
+  durationMinutes Int
+  language        String
+  startedAt       DateTime?
+  endedAt         DateTime?
+  durationSeconds Int?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  format   InterviewFormat @relation(fields: [formatId], references: [id])
+  messages Message[]
+
+  @@index([userId])
+  @@index([userId, createdAt])
+  @@index([status])
+}

@@ -5,6 +5,7 @@ model User {
     name              String?
     preferredLanguage String?
     googleId          String?  @unique
-    createdAt         DateTime @default(now())
-    updatedAt         DateTime @updatedAt
+    createdAt         DateTime       @default(now())
+    updatedAt         DateTime       @updatedAt
+    conversations     Conversation[]
 }
