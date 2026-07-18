@@ -22,6 +22,7 @@ model Conversation {
   difficulty      Difficulty
   durationMinutes Int
   language        String
+  speaker         String
   startedAt       DateTime?
   endedAt         DateTime?
   durationSeconds Int?

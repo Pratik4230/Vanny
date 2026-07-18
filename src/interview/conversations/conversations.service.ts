@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { pickInterviewSpeaker } from 'src/ai/sarvam.constants';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateConversationDto } from './dto/create-conversation.dto';
 
@@ -20,6 +21,7 @@ const conversationSelect = {
   difficulty: true,
   durationMinutes: true,
   language: true,
+  speaker: true,
   startedAt: true,
   endedAt: true,
   durationSeconds: true,
@@ -52,6 +54,7 @@ export class ConversationsService {
         difficulty: dto.difficulty,
         durationMinutes: dto.durationMinutes,
         language: dto.language,
+        speaker: pickInterviewSpeaker(),
         status: PENDING,
       },
       select: conversationSelect,

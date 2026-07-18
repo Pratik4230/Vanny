@@ -5,6 +5,9 @@ const REQUIRED_ENV = [
   'JWT_REFRESH_SECRET',
   'JWT_ACCESS_EXPIRY',
   'JWT_REFRESH_EXPIRY',
+  'OPENAI_API_KEY',
+  'OPENAI_MODEL',
+  'SARVAM_API_KEY',
 ] as const;
 
 export function validateEnv(config: Record<string, unknown>) {
