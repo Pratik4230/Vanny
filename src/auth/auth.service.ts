@@ -5,11 +5,12 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { randomBytes, scrypt } from 'crypto';
+import { randomBytes, scrypt, timingSafeEqual } from 'crypto';
 import { promisify } from 'util';
 
 import { RedisService } from 'src/redis/redis.service';
 import { UsersService } from 'src/users/users.service';
+import { REFRESH_TOKEN_TTL_SECONDS } from './auth.constants';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 
@@ -17,8 +18,6 @@ const scryptAsync = promisify(scrypt);
 
 @Injectable()
 export class AuthService {
-  private readonly REFRESH_TTL = 60 * 60 * 24 * 7;
-
   constructor(
     private readonly users: UsersService,
     private readonly jwt: JwtService,
@@ -78,13 +77,12 @@ export class AuthService {
         secret: this.config.getOrThrow<string>('JWT_REFRESH_SECRET'),
       });
 
-      await this.redis.redis.del(`refresh_token:${payload.sub}`);
-    } catch (error) {
-      throw new UnauthorizedException(
-        error instanceof Error
-          ? error.message
-          : 'Invalid or expired refresh token',
-      );
+      const key = `refresh_token:${payload.sub}`;
+      const stored = await this.redis.redis.get(key);
+
+      if (stored === refreshToken) await this.redis.redis.del(key);
+    } catch {
+      return;
     }
   }
 
@@ -105,7 +103,7 @@ export class AuthService {
       `refresh_token:${userId}`,
       refreshToken,
       'EX',
-      this.REFRESH_TTL,
+      REFRESH_TOKEN_TTL_SECONDS,
     );
 
     return { accessToken, refreshToken };
@@ -122,7 +120,14 @@ export class AuthService {
     supplied: string,
   ): Promise<boolean> {
     const [salt, hash] = stored.split(':');
+    if (!salt || !hash) return false;
+
     const suppliedHash = (await scryptAsync(supplied, salt, 64)) as Buffer;
-    return hash === suppliedHash.toString('hex');
+    const storedHash = Buffer.from(hash, 'hex');
+
+    return (
+      storedHash.length === suppliedHash.length &&
+      timingSafeEqual(storedHash, suppliedHash)
+    );
   }
 }

@@ -22,5 +22,25 @@ export function validateEnv(config: Record<string, unknown>) {
     );
   }
 
+  const frontendOrigin = config.FRONTEND_ORIGIN;
+  if (frontendOrigin !== undefined) {
+    if (typeof frontendOrigin !== 'string') {
+      throw new Error('FRONTEND_ORIGIN must be an absolute HTTP(S) origin');
+    }
+
+    try {
+      const url = new URL(frontendOrigin);
+
+      if (
+        (url.protocol !== 'http:' && url.protocol !== 'https:') ||
+        url.origin !== frontendOrigin
+      ) {
+        throw new Error();
+      }
+    } catch {
+      throw new Error('FRONTEND_ORIGIN must be an absolute HTTP(S) origin');
+    }
+  }
+
   return config;
 }
